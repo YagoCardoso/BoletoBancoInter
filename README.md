@@ -50,5 +50,5 @@ var result = inter.BoletoDetalhado(nossoNumero).Result;
 - Boleto em PDF
 ```C#
 var result = inter.BoletoPdf(nossoNumero).Result;
-File.WriteAllBytes(caminhoPDF, result);
+File.WriteAllBytes("C:\boleto.pdf", result);
 ```
