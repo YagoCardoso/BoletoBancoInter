@@ -8,7 +8,7 @@ using System.IO;
 namespace BancoInterTest
 {
     [TestClass]
-    public class ServiceTest
+    public class ServiceAsyncTest
     {
         [TestMethod]
         public void Post_NovoBoleto()
@@ -35,29 +35,29 @@ namespace BancoInterTest
             boleto.mensagem.linha4 = "linha 4 da mensagem teste";
             boleto.mensagem.linha5 = "linha 5 da mensagem teste";
 
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
             var resp = inter.NovoBoleto(boleto);
 
-            var send = resp != null;
-            
+            var send = resp.Result != null;
+
             Assert.IsTrue(send);
 
-            var jsonResult = JsonConvert.SerializeObject(resp);
+            var jsonResult = JsonConvert.SerializeObject(resp.Result);
             Console.WriteLine(jsonResult);
         }
 
         [TestMethod]
         public void Post_BaixaBoleto()
         {
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
 
             var resp = inter.BaixaBoleto(StaticParams._nossoNumero, new BancoInter.Model.BaixaBoleto()
             {
                 codigoBaixa = BancoInter.Model.BaixaBoleto.CodigoBaixa.FALTADESOLUCAO
             });
 
-            var send = resp == null;
-            
+            var send = resp.Result == null;
+
             Assert.IsTrue(send);
         }
 
@@ -70,20 +70,20 @@ namespace BancoInterTest
             boleto.desconto3.codigoDesconto = NovoBoleto.Desconto.CodigoDesconto.VALORFIXODATAINFORMADA;
             boleto.multa.codigoMulta = NovoBoleto.Multa.CodigoMulta.PERCENTUAL;
             boleto.mora.codigoMora = NovoBoleto.Mora.CodigoMora.TAXAMENSAL;
-            
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
             var resp = inter.NovoBoleto(boleto);
 
             bool send = false;
 
-            Assert.ThrowsException<AggregateException>(delegate { send = resp != null; });
+            Assert.ThrowsException<AggregateException>(delegate { send = resp.Result != null; });
             Assert.IsFalse(send);
         }
 
         [TestMethod]
         public void Get_ListaBoletos()
         {
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
 
             var filtro = new FiltroBoleto();
             filtro.dataInicial = new DateTime(2020, 11, 1, 0, 0, 0);
@@ -91,28 +91,28 @@ namespace BancoInterTest
 
             var resp = inter.ListaBoletos(filtro);
 
-            var send = resp != null;
-            
+            var send = resp.Result != null;
+
             Assert.IsTrue(send);
 
-            var jsonResult = JsonConvert.SerializeObject(resp);
+            var jsonResult = JsonConvert.SerializeObject(resp.Result);
             Console.WriteLine(jsonResult);
         }
 
         [TestMethod]
         public void Get_BoletoPDF()
         {
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
 
             var resp = inter.BoletoPdf(StaticParams._nossoNumero);
 
-            var send = resp != null;
+            var send = resp.Result != null;
 
             if (send)
             {
                 if (File.Exists(StaticParams._caminhoPDF))
                     File.Delete(StaticParams._caminhoPDF);
-                File.WriteAllBytes(StaticParams._caminhoPDF, resp);
+                File.WriteAllBytes(StaticParams._caminhoPDF, resp.Result);
             }
 
             Assert.IsTrue(send);
@@ -121,15 +121,15 @@ namespace BancoInterTest
         [TestMethod]
         public void Get_BoletoDetalhado()
         {
-            var inter = new BancoInter.Service(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
+            var inter = new BancoInter.ServiceAsync(StaticParams._numContaCorrente, StaticParams._caminhoCertificado, StaticParams._password);
 
             var resp = inter.BoletoDetalhado(StaticParams._nossoNumero);
 
-            var send = resp != null;
+            var send = resp.Result != null;
 
             Assert.IsTrue(send);
 
-            var jsonResult = JsonConvert.SerializeObject(resp);
+            var jsonResult = JsonConvert.SerializeObject(resp.Result);
             Console.WriteLine(jsonResult);
         }
     }

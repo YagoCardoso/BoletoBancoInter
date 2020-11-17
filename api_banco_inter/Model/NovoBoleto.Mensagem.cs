@@ -31,6 +31,7 @@ namespace BancoInter.Model
                     linha4 = mensagem.Substring(tamanhoMaximoPorLinha * 3);//234
                     linha5 = mensagem.Substring(tamanhoMaximoPorLinha * 4);//312
                 }
+                catch { }
                 finally
                 {
                     if (linha1.Length > tamanhoMaximoPorLinha) linha1 = mensagem.Substring(0, tamanhoMaximoPorLinha);

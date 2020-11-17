@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace BancoInter
 {
-    public class Service
+    public class ServiceAsync
     {
         private string _url = "https://apis.bancointer.com.br/openbanking/v1/certificado/boletos";
         private HttpClient _httpClient;
 
-        public Service(string numContaCorrente, string caminhoCertificado, string senha)
+        public ServiceAsync(string numContaCorrente, string caminhoCertificado, string senha)
         {
             //System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
             //System.Net.ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
@@ -32,48 +32,48 @@ namespace BancoInter
         }
 
         #region Common
-        private T Post<T>(string url, string body)
+        private async Task<T> Post<T>(string url, string body)
         {
-            using (var response = _httpClient
+            using (var response = await _httpClient
                 .PostAsync(url, new StringContent(body, Encoding.UTF8, "application/json")))
             {
-                string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
+                string apiResponse = await response.Content.ReadAsStringAsync();
 
-                if (response.Result.IsSuccessStatusCode == false)
+                if (response.IsSuccessStatusCode == false)
                 {
-                    throw new Exception(response.Result.ReasonPhrase, new Exception(apiResponse, new Exception(body)));
+                    throw new Exception(response.ReasonPhrase, new Exception(apiResponse, new Exception(body)));
                 }
 
                 return JsonConvert.DeserializeObject<T>(apiResponse);
             }
         }
 
-        private T Get<T>(string url)
+        private async Task<T> Get<T>(string url)
         {
-            using (var response = _httpClient
+            using (var response = await _httpClient
                 .GetAsync(url))
             {
-                string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
+                string apiResponse = await response.Content.ReadAsStringAsync();
 
-                if (response.Result.IsSuccessStatusCode == false)
+                if (response.IsSuccessStatusCode == false)
                 {
-                    throw new Exception(response.Result.ReasonPhrase, new Exception(apiResponse));
+                    throw new Exception(response.ReasonPhrase, new Exception(apiResponse));
                 }
 
                 return JsonConvert.DeserializeObject<T>(apiResponse);
             }
         }
 
-        private byte[] GetInBytes(string url)
+        private async Task<byte[]> GetInBytes(string url)
         {
-            using (var response = _httpClient
+            using (var response = await _httpClient
                  .GetAsync(url))
             {
-                string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
+                string apiResponse = await response.Content.ReadAsStringAsync();
 
-                if (response.Result.IsSuccessStatusCode == false)
+                if (response.IsSuccessStatusCode == false)
                 {
-                    throw new Exception(response.Result.ReasonPhrase, new Exception(apiResponse));
+                    throw new Exception(response.ReasonPhrase, new Exception(apiResponse));
                 }
 
                 return Convert.FromBase64String(apiResponse);
@@ -102,47 +102,47 @@ namespace BancoInter
         #endregion
 
         #region Post
-        public virtual NovoBoleto.Response NovoBoleto(NovoBoleto boleto)
+        public virtual async Task<NovoBoleto.Response> NovoBoleto(NovoBoleto boleto)
         {
             boleto.isValid();
 
             var url = GetUrl(string.Empty);
 
             var jsonBody = JsonConvert.SerializeObject(boleto);
-            
-            return Post<NovoBoleto.Response>(url, jsonBody);
+
+            return await Post<NovoBoleto.Response>(url, jsonBody);
         }
 
-        public virtual BaixaBoleto.Response BaixaBoleto(string nossoNumero, BaixaBoleto boleto)
+        public virtual async Task<BaixaBoleto.Response> BaixaBoleto(string nossoNumero, BaixaBoleto boleto)
         {
             var url = GetUrl($"/{nossoNumero}/baixas");
 
             var jsonBody = JsonConvert.SerializeObject(boleto);
 
-            return Post<BaixaBoleto.Response>(url, jsonBody);
+            return await Post<BaixaBoleto.Response>(url, jsonBody);
         }
         #endregion
 
         #region Get
-        public virtual byte[] BoletoPdf(string nossoNumero)
+        public virtual async Task<byte[]> BoletoPdf(string nossoNumero)
         {
             var url = GetUrl($"/{nossoNumero}/pdf");
 
-            return GetInBytes(url);
+            return await GetInBytes(url);
         }
 
-        public virtual BoletoDetalhado.Response BoletoDetalhado(string nossoNumero)
+        public virtual async Task<BoletoDetalhado.Response> BoletoDetalhado(string nossoNumero)
         {
             var url = GetUrl($"/{nossoNumero}");
 
-            return Get<BoletoDetalhado.Response>(url);
+            return await Get<BoletoDetalhado.Response>(url);
         }
 
-        public virtual FiltroBoleto.Response ListaBoletos(FiltroBoleto filtroBoleto)
+        public virtual async Task<FiltroBoleto.Response> ListaBoletos(FiltroBoleto filtroBoleto)
         {
             var url = GetUrl($"?{QueryString<FiltroBoleto>(filtroBoleto)}");
 
-            return Get<FiltroBoleto.Response>(url);
+            return await Get<FiltroBoleto.Response>(url);
         }
         #endregion
 

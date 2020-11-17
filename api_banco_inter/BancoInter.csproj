@@ -57,6 +57,7 @@
     <Compile Include="Model\NovoBoleto.Mensagem.cs" />
     <Compile Include="Model\NovoBoleto.Response.cs" />
     <Compile Include="Service.cs" />
+    <Compile Include="ServiceAsync.cs" />
     <Compile Include="Validation.cs" />
     <Compile Include="Model\BaixaBoleto.cs" />
     <Compile Include="Model\NovoBoleto.cs" />
