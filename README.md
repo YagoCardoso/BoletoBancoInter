@@ -17,9 +17,14 @@ Consumo de API para emissão de boletos no Banco Inter
 # Consumindo a API
 - Instancie a classe passando o numero da conta corrente, o caminho do certificado, e a senha.
 ```C#
+//Métodos assíncronos
+var inter = new BancoInter.ServiceAsync(numContaCorrente, caminhoCertificado, password);
+
+//ou
+
+//Métodos síncrono
 var inter = new BancoInter.Service(numContaCorrente, caminhoCertificado, password);
 ```
-
 
 - Gerar novo boleto
 ```C#
