@@ -22,7 +22,7 @@ var inter = new BancoInter.ServiceAsync(numContaCorrente, caminhoCertificado, pa
 
 //ou
 
-//Métodos síncrono
+//Métodos síncronos
 var inter = new BancoInter.Service(numContaCorrente, caminhoCertificado, password);
 ```
 
